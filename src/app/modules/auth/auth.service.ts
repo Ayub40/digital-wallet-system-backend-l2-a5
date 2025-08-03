@@ -6,7 +6,7 @@ import httpStatus from 'http-status-codes';
 import AppError from "../../errorHelpers/AppError";
 import { User } from '../user/user.model';
 import { createNewAccessTokenWithRefreshToken } from '../../utils/userTokens';
-import { JwtPayload } from 'jsonwebtoken';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 import { envVars } from '../../config/env';
 import { IAuthProvider, IsActive } from '../user/user.interface';
 // import { sendEmail } from '../../utils/sendEmail';
@@ -111,6 +111,41 @@ const setPassword = async (userId: string, plainPassword: string) => {
 
 }
 
+const forgotPassword = async (email: string) => {
+    const isUserExist = await User.findOne({ email });
+
+    if (!isUserExist) {
+        throw new AppError(httpStatus.BAD_REQUEST, "User does not exist")
+    }
+    if (!isUserExist.isVerified) {
+        throw new AppError(httpStatus.BAD_REQUEST, "User is not verified")
+    }
+    if (isUserExist.isActive === IsActive.BLOCKED || isUserExist.isActive === IsActive.INACTIVE) {
+        throw new AppError(httpStatus.BAD_REQUEST, `User is ${isUserExist.isActive}`)
+    }
+    if (isUserExist.isDeleted) {
+        throw new AppError(httpStatus.BAD_REQUEST, "User is deleted")
+    }
+
+    const jwtPayload = {
+        userId: isUserExist._id,
+        email: isUserExist.email,
+        role: isUserExist.role
+    }
+
+    const resetToken = jwt.sign(jwtPayload, envVars.JWT_ACCESS_SECRET, {
+        expiresIn: "10m"
+    })
+
+    const resetUILink = `${envVars.FRONTEND_URL}/reset-password?id=${isUserExist._id}&token=${resetToken}`
+
+
+    /**
+     * http://localhost:5173/reset-password?id=6887a719489f6cfe1748b0bb&token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODg3YTcxOTQ4OWY2Y2ZlMTc0OGIwYmIiLCJlbWFpbCI6ImtheXViMzQ1M0BnbWFpbC5jb20iLCJyb2xlIjoiVVNFUiIsImlhdCI6MTc1MzcyMDg2MSwiZXhwIjoxNzUzNzIxNDYxfQ.pIQrOOUqmMe9BkYFXessOwW2OuoysIDiWq119sHzeUk
+     */
+}
+
+
 const changePassword = async (oldPassword: string, newPassword: string, decodedToken: JwtPayload) => {
 
     const user = await User.findById(decodedToken.userId)
@@ -134,6 +169,6 @@ export const AuthServices = {
     getNewAccessToken,
     changePassword,
     setPassword,
-    // forgotPassword,
+    forgotPassword,
     resetPassword
 }

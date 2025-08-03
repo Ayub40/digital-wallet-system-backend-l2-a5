@@ -92,17 +92,34 @@ src/
 
 ## 🧪 API Endpoints (Sample)
 
-| Method | Endpoint                   | Description                    |
-|--------|----------------------------|--------------------------------|
-| POST   | `/auth/register`           | Register new user/agent       |
-| POST   | `/auth/login`              | Login                         |
-| GET    | `/users/me`                | Get logged-in user info       |
-| PATCH  | `/users/:id/approve`       | Approve/Suspend agent         |
-| POST   | `/transactions/add-money`  | Add money to wallet           |
-| POST   | `/transactions/withdraw`   | Withdraw from wallet          |
-| POST   | `/transactions/send`       | Send money to another user    |
-| POST   | `/transactions/cash-in`    | Agent cash in to a user       |
-| POST   | `/transactions/cash-out`   | Agent cash out from a user    |
+| Method | Endpoint                                     | Description                          |
+|--------|----------------------------------------------|--------------------------------------|
+| POST   | `/auth/register`                             | Register new user/agent              |
+| POST   | `/auth/login`                                | Login with email and password        |
+| POST   | `/auth/refresh-token`                        | Get new access token from refresh    |
+| POST   | `/auth/logout`                               | Logout from session                  |
+| POST   | `/auth/change-password`                      | Change password                      |
+| POST   | `/auth/set-password`                         | Set initial password (after Google)  |
+| POST   | `/auth/reset-password`                       | Reset password using token           |
+| GET    | `/auth/google`                               | Login via Google                     |
+| GET    | `/auth/google/callback`                      | Google login callback                |
+| POST   | `/user/register`                             | Register new user or agent           |
+| GET    | `/user/all-users`                            | Get all users (admin only)           |
+| GET    | `/user/agents`                               | Get all agents (admin only)          |
+| PATCH  | `/user/:id`                                  | Update user info                     |
+| PATCH  | `/user/user/status/:id`                      | Block/Unblock user                   |
+| PATCH  | `/user/agent/approve-suspend/:id`            | Approve or suspend an agent          |
+| GET    | `/wallet/wallets`                            | Get all wallets (admin only)         |
+| PATCH  | `/wallet/wallets/block/:id`                  | Block a specific wallet              |
+| POST   | `/transaction/addMoney`                      | Add money to your wallet             |
+| POST   | `/transaction/withDrawMoney`                 | Withdraw money from your wallet      |
+| POST   | `/transaction/send-money`                    | Send money to another user           |
+| GET    | `/transaction/get-history`                   | Get your transaction history         |
+| POST   | `/transaction/cash-in`                       | Agent cash-in to any user            |
+| POST   | `/transaction/cash-out`                      | Agent cash-out from a user           |
+| GET    | `/transaction/commission-history`            | Agent commission history             |
+| GET    | `/transaction/transactions-history`          | All transactions (admin only)        |
+
 
 ## ✅ Validation
 

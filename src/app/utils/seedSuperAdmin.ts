@@ -40,8 +40,8 @@ export const seedSuperAdmin = async () => {
             password: hashedPassword,
             isVerified: true,
             auths: [authProvider],
-            wallet: wallet._id
-
+            wallet: wallet._id,
+            isApproved: true
         }
 
         const superadmin = await User.create(payload)
