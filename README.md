@@ -130,8 +130,8 @@ Custom global error handler for consistent and structured error responses.
 ### Installation
 
 ```bash
-git clone https://github.com/your-username/digital-wallet-api.git
-cd digital-wallet-api
+git clone https://github.com/Ayub40/digital-wallet-system-backend-l2-a5.git
+cd digital-wallet-system-backend-l2-a5
 npm install
 ```
 
@@ -142,9 +142,25 @@ Create a `.env` file in the root directory:
 ```
 PORT=4000
 DATABASE_URL=your_mongodb_connection_string
-JWT_SECRET=your_jwt_secret
-JWT_EXPIRES_IN=1d
-BCRYPT_SALT_ROUNDS=10
+NODE_ENV=development
+
+JWT_ACCESS_SECRET=your_jwt_secret
+JWT_ACCESS_EXPIRES=your_jwt_expires
+JWT_REFRESH_SECRET=your_jwt_refresh-secret
+JWT_REFRESH_EXPIRES=your_jwt_refresh-expires
+
+BCRYPT_SALT_ROUND=
+
+SUPER_ADMIN_EMAIL=
+SUPER_ADMIN_PASSWORD=
+
+GOOGLE_CLIENT_SECRET=
+GOOGLE_CLIENT_ID=
+GOOGLE_CALLBACK_UR=
+
+EXPRESS_SESSION_SECRET
+
+FRONTEND_URL
 ```
 
 ### Run the Server
