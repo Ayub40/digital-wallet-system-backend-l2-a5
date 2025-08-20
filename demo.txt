@@ -1,0 +1,43 @@
+Agent ta korbo,, next e
+
+USER API:
+Create User : http://localhost:4000/api/v1/user/register ;
+
+jWT: 
+  auth.controller.ts, auth.service.ts, user.controller.ts, user.service.ts, 
+booking.controller.ts, passport.ts
+=============
+Already Done:
+.env, 
+.env.ts, index.d.ts, checkAuth.ts, jwt.ts, user.Token.ts, 
+=============================
+{
+    "name": "Ayub Khan 2",
+    "email": "ayubk2@gmail.com",
+    "password": "123456Ph@",
+    "phone": "+8801710000007"
+}
+=====================================
+Ki ki kora hoyse 
+=====================================
+Minimum Functional Requirements
+✅ JWT-based login system with three roles: admin, user, agent ================================================== Done
+✅ Secure password hashing (using bcrypt or other appropiate way)================================================ Done
+✅ Each user and agent must have a wallet automatically created at registration (e.g., initial balance: ৳50)===== Done
+✅ Users should be able to:
+Add money (top-up) =============================================================================================== Done
+Withdraw money =================================================================================================== Done
+Send money to another user ======================================================================================= Done
+View transaction history ========================================================================================= Done
+✅ Agents should be able to:
+Add money to any user's wallet (cash-in) ========================================================================= Done
+Withdraw money from any user's wallet (cash-out) ================================================================= Done
+View their commission history (optional) ========================================================================= (Something)
+✅ Admins should be able to:
+View all users, agents, wallets and transactions ================================================================= Done
+Block/unblock user wallets 
+Approve/suspend agents 
+Set system parameters (e.g., transaction fees) (optional)
+✅ All transactions must be stored and trackable ================================================================= Done
+✅ Role-based route protection must be implemented =============================================================== Done
+
