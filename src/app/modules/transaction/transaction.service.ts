@@ -6,6 +6,7 @@ import { TransactionType } from "./transaction.interface";
 import { Role } from "../user/user.interface";
 import { Types } from "mongoose";
 import { User } from "../user/user.model";
+import { QueryBuilder } from "../../utils/QueryBuilder";
 
 const addMoney = async (userId: string, amount: number) => {
     console.log("Add Money Called for userId:", userId);
@@ -282,8 +283,36 @@ const getAgentCommissionHistory = async (agentId: string, role: Role) => {
 
 
 // For Admin
-const getAllTransactions = async () => {
-    return await Transaction.find({}).populate("sender receiver", "email");
+// const getAllTransactions = async () => {
+//     return await Transaction.find({}).populate("sender receiver", "email");
+// };
+const getAllTransactions = async (query: Record<string, string>) => {
+
+    // const queryBuilder = new QueryBuilder(Transactions.find(), query);
+    // const queryBuilder = new QueryBuilder(Transaction.find(), query);
+
+    // const transaction = await queryBuilder
+    //     .paginate()
+
+    // const [data, meta] = await Promise.all([
+    //     transaction.build(),
+    //     queryBuilder.getMeta()
+    // ])
+
+    const queryBuilder = new QueryBuilder(Transaction.find(), query).paginate();
+    const dataQuery = queryBuilder.build().populate("sender receiver", "name email");
+
+    const [data, meta] = await Promise.all([
+        dataQuery,
+        queryBuilder.getMeta()
+    ]);
+
+    return {
+        data,
+        meta
+    }
+
+    // return await Transaction.find({}).populate("sender receiver", "email");
 };
 
 

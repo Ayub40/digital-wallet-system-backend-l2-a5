@@ -177,6 +177,13 @@ const updateRole = async (userId: string, role: Role) => {
     if (!user) throw new AppError(httpStatus.NOT_FOUND, "User not found");
 
     user.role = role;
+
+    if (role === Role.AGENT) {
+        user.isAgentStatus = IsAgentStatus.APPROVED;
+    } else {
+        user.isAgentStatus = IsAgentStatus.SUSPENDED;
+    }
+
     await user.save();
     return user;
 };

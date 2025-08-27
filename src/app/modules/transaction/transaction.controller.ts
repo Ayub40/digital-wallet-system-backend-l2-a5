@@ -126,13 +126,17 @@ const agentCommissionHistory = catchAsync(async (req: Request, res: Response) =>
 });
 
 // For Admin
-const getAllTransactions = catchAsync(async (_req, res) => {
-    const transactions = await TransactionService.getAllTransactions();
+const getAllTransactions = catchAsync(async (req: Request, res: Response) => {
+    const query = req.query
+    // const transactions = await TransactionService.getAllTransactions();
+    const transactions = await TransactionService.getAllTransactions((query as Record<string, string>));
+
     sendResponse(res, {
         success: true,
         statusCode: httpStatus.OK,
         message: "All transactions fetched successfully",
-        data: transactions
+        data: transactions.data,
+        meta: transactions.meta,
     });
 });
 
