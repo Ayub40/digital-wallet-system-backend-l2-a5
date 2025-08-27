@@ -1,6 +1,5 @@
 import { model, Schema } from "mongoose";
-import { IAuthProvider, IsActive, IUser, Role } from "./user.interface";
-import { Wallet } from "../wallet/wallet.model";
+import { IAuthProvider, IsActive, IsAgentStatus, IUser, Role } from "./user.interface";
 
 const authProviderSchema = new Schema<IAuthProvider>({
     provider: { type: String, required: true },
@@ -34,6 +33,11 @@ const userSchema = new Schema<IUser>({
     // isVerified: { type: Boolean, default: false },
     isVerified: { type: Boolean, default: true },
     isApproved: { type: Boolean, default: false },
+    isAgentStatus: {
+        type: String,
+        enum: Object.values(IsAgentStatus),
+        default: IsAgentStatus.SUSPENDED
+    },
     auths: [authProviderSchema],
     // isBlocked: { type: Boolean, default: false }
 }, {

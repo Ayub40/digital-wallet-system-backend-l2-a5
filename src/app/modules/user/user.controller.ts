@@ -5,8 +5,9 @@ import { catchAsync } from "../../utils/catchAsync";
 import { UserServices } from "./user.service";
 import { sendResponse } from "../../utils/sendResponse";
 import { JwtPayload } from "jsonwebtoken";
-import { Role } from "./user.interface";
+import { IsActive, IsAgentStatus, Role } from "./user.interface";
 import AppError from "../../errorHelpers/AppError";
+
 
 const createUser = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const user = await UserServices.createUser(req.body)
@@ -20,16 +21,21 @@ const createUser = catchAsync(async (req: Request, res: Response, next: NextFunc
 })
 
 const updateUser = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-    const userId = req.params.id;
-    const verifiedToken = req.user;
 
+    const userId = (req.user as JwtPayload)?.userId;
     const payload = req.body;
-    const user = await UserServices.updateUser(userId, payload, verifiedToken as JwtPayload)
+    const user = await UserServices.updateUser(userId, payload, req.user as JwtPayload)
+
+    // const userId = req.params.id;
+    // const verifiedToken = req.user;
+    // const payload = req.body;
+    // const user = await UserServices.updateUser(userId, payload, verifiedToken as JwtPayload)
 
     sendResponse(res, {
         success: true,
         statusCode: httpStatus.CREATED,
         message: "User Updated Successfully",
+        // data: user,
         data: user,
     })
 })
@@ -44,14 +50,53 @@ const getAllUsers = catchAsync(async (_req, res) => {
     });
 });
 
+const getSingleUser = catchAsync(async (req, res) => {
+    const userId = req.params.id;
+    const user = await UserServices.getSingleUser(userId);
+
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: "User fetched successfully",
+        data: user,
+    });
+});
+
+const getMe = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const decodedToken = req.user as JwtPayload
+    const result = await UserServices.getMe(decodedToken.userId);
+
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.CREATED,
+        message: "Your profile Retrieved Successfully",
+        data: result.data
+    })
+})
+
 const userStatus = catchAsync(async (req, res) => {
     const userId = req.params.id;
     const user = await UserServices.userStatus(userId);
     sendResponse(res, {
         success: true,
         statusCode: httpStatus.OK,
-        message: "User status toggled",
+        // message: "User status toggled",
+        message: user.isActive === IsActive.ACTIVE ? "User Activated" : "User Blocked",
         data: user
+    });
+});
+
+const updateRole = catchAsync(async (req, res) => {
+    const { id } = req.params;
+    const { role } = req.body;
+
+    const user = await UserServices.updateRole(id, role);
+
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: "User role updated successfully",
+        data: user,
     });
 });
 
@@ -65,6 +110,7 @@ const getAllAgents = catchAsync(async (_req, res) => {
     });
 });
 
+
 const agentApproval = catchAsync(async (req: Request, res: Response) => {
     const userId = req.params.id;
     const updatedAgent = await UserServices.agentApproval(userId);
@@ -72,7 +118,7 @@ const agentApproval = catchAsync(async (req: Request, res: Response) => {
     sendResponse(res, {
         success: true,
         statusCode: httpStatus.OK,
-        message: updatedAgent.isApproved ? "Agent Approved" : "Agent Suspended",
+        message: updatedAgent.isAgentStatus === IsAgentStatus.APPROVED ? "Agent Approved" : "Agent Suspended",
         data: updatedAgent,
     });
 });
@@ -84,5 +130,25 @@ export const UserControllers = {
     getAllUsers,
     userStatus,
     getAllAgents,
-    agentApproval
+    agentApproval,
+    getMe,
+    updateRole,
+    getSingleUser
 }
+
+
+
+
+// const getMe = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+//     const userId = req.user?.userId;
+//     if (!userId) throw new AppError(httpStatus.UNAUTHORIZED, "Unauthorized");
+
+//     const user = await UserServices.getMe(userId);
+
+//     sendResponse(res, {
+//         success: true,
+//         statusCode: httpStatus.OK,
+//         message: "User info fetched successfully",
+//         data: user
+//     });
+// });

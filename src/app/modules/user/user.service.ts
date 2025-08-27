@@ -1,4 +1,5 @@
-import { IAuthProvider, IsActive, IUser, Role } from "./user.interface";
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { IAuthProvider, IsActive, IsAgentStatus, IUser, Role } from "./user.interface";
 import { User } from "./user.model";
 import AppError from "../../errorHelpers/AppError";
 import httpStatus from 'http-status-codes';
@@ -35,7 +36,8 @@ const createUser = async (payload: Partial<IUser>) => {
         password: hashedPassword,
         auths: [authProvider],
         wallet: wallet._id,
-        ...rest
+        ...rest,
+        role: rest.role || Role.USER,
     });
 
     const createdUserWithWallet = await User.findById(user._id).populate('wallet', "balance");
@@ -44,6 +46,10 @@ const createUser = async (payload: Partial<IUser>) => {
 }
 
 const updateUser = async (userId: string, payload: Partial<IUser>, decoded: JwtPayload) => {
+    // const updateUser = async (userId: string, payload: Partial<IUser & { oldPassword?: string; newPassword?: string }>, decoded: JwtPayload) => {
+
+    // const user = await User.findById(userId).select("+password");
+
     const user = await User.findById(userId);
     if (!user) throw new AppError(httpStatus.NOT_FOUND, "User Not Found");
 
@@ -72,6 +78,24 @@ const updateUser = async (userId: string, payload: Partial<IUser>, decoded: JwtP
     if (payload.password) {
         payload.password = await bcryptjs.hash(payload.password, envVars.BCRYPT_SALT_ROUND);
     }
+
+    // ========= New code ================
+    // if (payload.oldPassword && payload.newPassword) {
+    //     const isPasswordMatch = await bcryptjs.compare(payload.oldPassword, user.password);
+    //     if (!isPasswordMatch) {
+    //         throw new AppError(httpStatus.BAD_REQUEST, "Old password is incorrect");
+    //     }
+
+    //     user.password = await bcryptjs.hash(payload.newPassword, Number(envVars.BCRYPT_SALT_ROUND));
+    // }
+    // ========= New code ================
+
+    // Update name and phone
+    // if (payload.name) user.name = payload.name;
+    // if (payload.phone) user.phone = payload.phone;
+    // await user.save();
+    // const { password: _, ...rest } = user.toObject();
+    // return rest;
 
     return await User.findByIdAndUpdate(userId, payload, { new: true, runValidators: true });
 };
@@ -114,32 +138,91 @@ const getAllUsers = async () => {
     return await User.find({});
 };
 
+const getSingleUser = async (userId: string) => {
+    // const user = await User.findById(userId);
+    // if (!user) throw new AppError(httpStatus.NOT_FOUND, "User not found");
+    // return user;
+
+    const user = await User.findById(userId).populate("wallet");
+    if (!user) throw new AppError(httpStatus.NOT_FOUND, "User not found");
+    return user;
+};
+
+const getMe = async (userId: string) => {
+    const user = await User.findById(userId).select("-password").populate("wallet", "balance");
+    return {
+        data: user
+    }
+};
+
 const userStatus = async (userId: string) => {
-    const user = await User.findById(userId);
+    const user = await User.findById(userId).populate("wallet")
     if (!user) throw new AppError(httpStatus.NOT_FOUND, "User not found");
 
     // user.isActive = user.isActive === "ACTIVE" ? "BLOCKED" : "ACTIVE";
     user.isActive = user.isActive === IsActive.ACTIVE ? IsActive.BLOCKED : IsActive.ACTIVE;
+
+    if (user.wallet) {
+        await Wallet.findByIdAndUpdate(user.wallet._id, {
+            isBlocked: user.isActive === IsActive.BLOCKED
+        });
+    }
+
+    await user.save();
+    return user;
+};
+
+const updateRole = async (userId: string, role: Role) => {
+    const user = await User.findById(userId);
+    if (!user) throw new AppError(httpStatus.NOT_FOUND, "User not found");
+
+    user.role = role;
     await user.save();
     return user;
 };
 
 const getAllAgents = async () => {
     return await User.find({ role: Role.AGENT });
+
+    // return await User.find({
+    //     role: Role.AGENT,
+    //     isAgentStatus: IsAgentStatus.APPROVED
+    // });
 };
 
 const agentApproval = async (userId: string) => {
     const user = await User.findById(userId);
     if (!user) throw new AppError(httpStatus.NOT_FOUND, "User not found");
 
-    if (user.role !== Role.AGENT) {
-        throw new AppError(httpStatus.BAD_REQUEST, "Only agents can be approved or suspended");
+    if (user.isAgentStatus === IsAgentStatus.APPROVED) {
+        user.isAgentStatus = IsAgentStatus.SUSPENDED;
+        user.role = Role.USER;
+    } else {
+        user.isAgentStatus = IsAgentStatus.APPROVED;
+        user.role = Role.AGENT;
     }
 
-    user.isApproved = !user.isApproved;
+    // if (user.role !== Role.AGENT) {
+    // if (user.role !== Role.AGENT && user.isApproved === false) {
+    //     throw new AppError(httpStatus.BAD_REQUEST, "Only agents can be approved or suspended");
+    // }
+
+    // user.isApproved = !user.isApproved;
+
+    // if (!user.isApproved) {
+    //     user.role = Role.USER;
+    // } else {
+    //     user.role = Role.AGENT;
+    // }
+
     await user.save();
 
     return user;
+    // return {
+    //     success: true,
+    //     message: user.isApproved ? "Agent approved" : "Agent suspended",
+    //     data: user,
+    // };
 };
 
 
@@ -150,5 +233,18 @@ export const UserServices = {
     getAllUsers,
     userStatus,
     getAllAgents,
-    agentApproval
+    agentApproval,
+    getMe,
+    updateRole,
+    getSingleUser
 }
+
+// const getMe = async (userId: string) => {
+//     const user = await User.findById(userId)
+//         .select("-password")
+//         .populate("wallet", "balance");
+
+//     if (!user) throw new AppError(httpStatus.NOT_FOUND, "User not found");
+
+//     return user;
+// };

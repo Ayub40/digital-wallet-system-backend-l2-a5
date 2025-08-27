@@ -41,6 +41,7 @@ const resetPassword = async (payload: Record<string, any>, decodedToken: JwtPayl
     await isUserExist.save()
 }
 
+
 // const forgotPassword = async (email: string) => {
 //     const isUserExist = await User.findOne({ email });
 
@@ -158,8 +159,6 @@ const changePassword = async (oldPassword: string, newPassword: string, decodedT
     user!.password = await bcryptjs.hash(newPassword, Number(envVars.BCRYPT_SALT_ROUND))
 
     user!.save();
-
-
 }
 
 //user - login - token (email, role, _id) - booking / payment / booking / payment cancel - token 

@@ -18,6 +18,11 @@ export enum IsActive {
     BLOCKED = "BLOCKED"
 };
 
+export enum IsAgentStatus {
+    APPROVED = "APPROVED",
+    SUSPENDED = "SUSPENDED"
+}
+
 export interface IUser {
     _id?: Types.ObjectId;
     name: string;
@@ -29,7 +34,7 @@ export interface IUser {
     isVerified?: boolean,
     role: Role;
     isApproved: boolean,
-    // isBlocked: boolean;
+    isAgentStatus: IsAgentStatus,
     auths: IAuthProvider[];
     wallet?: Types.ObjectId,
 }
