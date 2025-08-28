@@ -49,27 +49,16 @@ const sendMoney = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
-
-// const sendMoney = catchAsync(async (req: Request, res: Response) => {
-//     const { receiverId, amount } = req.body;
-//     const decodeToken = req.user as JwtPayload;
-//     const result = await TransactionService.sendMoney(decodeToken.userId, receiverId, amount);
-//     sendResponse(res, {
-//         success: true,
-//         statusCode: httpStatus.OK,
-//         message: "Money sent successfully",
-//         data: result
-//     });
-// })
-
 const getHistory = catchAsync(async (req: Request, res: Response) => {
     const decodeToken = req.user as JwtPayload;
-    const history = await TransactionService.getHistory(decodeToken.userId);
+    const history = await TransactionService.getHistory(decodeToken.userId, req.query as Record<string, string>);
     sendResponse(res, {
         success: true,
         statusCode: httpStatus.OK,
         message: "Transaction history fetched successfully",
-        data: history
+        // data: history
+        data: history.data,
+        meta: history.meta,
     });
 })
 
@@ -128,7 +117,6 @@ const agentCommissionHistory = catchAsync(async (req: Request, res: Response) =>
 // For Admin
 const getAllTransactions = catchAsync(async (req: Request, res: Response) => {
     const query = req.query
-    // const transactions = await TransactionService.getAllTransactions();
     const transactions = await TransactionService.getAllTransactions((query as Record<string, string>));
 
     sendResponse(res, {
@@ -152,43 +140,3 @@ export const TransactionController = {
     agentCommissionHistory,
     getAllTransactions
 }
-
-
-
-// const agentCashIn = catchAsync(async (req: Request, res: Response) => {
-//     const agent = req.user as JwtPayload;
-//     const { userId, amount } = req.body;
-
-//     if (agent.role !== Role.AGENT) {
-//         throw new AppError(httpStatus.FORBIDDEN, "Only agents can perform cash-in");
-//     }
-
-//     const wallet = await TransactionService.agentCashIn(agent.userId, userId, amount);
-
-//     sendResponse(res, {
-//         success: true,
-//         statusCode: httpStatus.OK,
-//         message: "Cash-in successful",
-//         data: wallet
-//     });
-// });
-
-
-
-// const agentCashOut = catchAsync(async (req: Request, res: Response) => {
-//     const agent = req.user as JwtPayload;
-//     const { userId, amount } = req.body;
-
-//     if (agent.role !== Role.AGENT) {
-//         throw new AppError(httpStatus.FORBIDDEN, "Only agents can perform cash-out");
-//     }
-
-//     const wallet = await TransactionService.agentCashOut(agent.userId, userId, amount);
-
-//     sendResponse(res, {
-//         success: true,
-//         statusCode: httpStatus.OK,
-//         message: "Cash-out successful",
-//         data: wallet
-//     });
-// });
