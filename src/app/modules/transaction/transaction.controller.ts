@@ -81,7 +81,6 @@ const agentCashIn = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
-
 const agentCashOut = catchAsync(async (req: Request, res: Response) => {
     const agent = req.user as JwtPayload;
     const { identifier, amount } = req.body;
@@ -99,7 +98,6 @@ const agentCashOut = catchAsync(async (req: Request, res: Response) => {
         data: wallet
     });
 });
-
 
 const agentCommissionHistory = catchAsync(async (req: Request, res: Response) => {
     const agent = req.user as JwtPayload;

@@ -65,13 +65,17 @@ const logout = catchAsync(async (req: Request, res: Response, next: NextFunction
 
     res.clearCookie("accessToken", {
         httpOnly: true,
-        secure: false,
-        sameSite: "lax"
+        // secure: false,
+        // sameSite: "lax"
+        secure: true,
+        sameSite: "none"
     })
     res.clearCookie("refreshToken", {
         httpOnly: true,
-        secure: false,
-        sameSite: "lax"
+        // secure: false,
+        // sameSite: "lax"
+        secure: true,
+        sameSite: "none"
     })
 
     sendResponse(res, {
@@ -157,7 +161,7 @@ const googleCallbackController = catchAsync(async (req: Request, res: Response, 
         throw new AppError(httpStatus.NOT_FOUND, "User Not Found")
     }
 
-    const tokenInfo = createUserTokens(user) 
+    const tokenInfo = createUserTokens(user)
 
     setAuthCookie(res, tokenInfo)
 

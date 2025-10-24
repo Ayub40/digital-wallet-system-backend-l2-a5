@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.IsActive = exports.Role = void 0;
+exports.IsAgentStatus = exports.IsActive = exports.Role = void 0;
 var Role;
 (function (Role) {
     Role["SUPER_ADMIN"] = "SUPER_ADMIN";
@@ -15,3 +15,8 @@ var IsActive;
     IsActive["BLOCKED"] = "BLOCKED";
 })(IsActive || (exports.IsActive = IsActive = {}));
 ;
+var IsAgentStatus;
+(function (IsAgentStatus) {
+    IsAgentStatus["APPROVED"] = "APPROVED";
+    IsAgentStatus["SUSPENDED"] = "SUSPENDED";
+})(IsAgentStatus || (exports.IsAgentStatus = IsAgentStatus = {}));

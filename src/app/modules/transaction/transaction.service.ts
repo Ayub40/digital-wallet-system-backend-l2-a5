@@ -7,6 +7,7 @@ import { Role } from "../user/user.interface";
 import { Types } from "mongoose";
 import { User } from "../user/user.model";
 import { QueryBuilder } from "../../utils/QueryBuilder";
+// import { transactionSearchableFields } from "./transaction.constant";
 
 const addMoney = async (userId: string, amount: number) => {
     console.log("Add Money Called for userId:", userId);
@@ -31,7 +32,8 @@ const addMoney = async (userId: string, amount: number) => {
 
 const withdrawMoney = async (userId: string, amount: number, agent: string) => {
     const agentUser = await User.findOne({
-        $or: [{ email: agent }, { phone: agent }]
+        $or: [{ email: agent }, { phone: agent }],
+        role: Role.AGENT
     });
 
     if (!agentUser) throw new AppError(httpStatus.NOT_FOUND, "Agent not found");
@@ -196,6 +198,7 @@ const getAgentCommissionHistory = async (agentId: string, role: Role) => {
     return history;
 };
 
+
 const getAllTransactions = async (query: Record<string, string>) => {
 
     const queryBuilder = new QueryBuilder(Transaction.find(), query).paginate();
@@ -213,6 +216,30 @@ const getAllTransactions = async (query: Record<string, string>) => {
     }
 
 };
+
+
+
+// const getAllTransactions = async (query: Record<string, string>) => {
+//     const queryBuilder = new QueryBuilder(Transaction.find(), query)
+//         .filter()
+//         .search(transactionSearchableFields)
+//         .sort()
+//         .fields()
+//         .paginate();
+
+//     const dataQuery = queryBuilder.build().populate("sender receiver", "name email");
+
+//     const [data, meta] = await Promise.all([
+//         dataQuery,
+//         queryBuilder.getMeta()
+//     ]);
+
+//     return {
+//         data,
+//         meta
+//     }
+// };
+
 
 const getHistory = async (userId: string, query: Record<string, string>) => {
     const objectUserId = new Types.ObjectId(userId);
@@ -255,6 +282,7 @@ const getHistory = async (userId: string, query: Record<string, string>) => {
         meta
     };
 };
+
 
 
 export const TransactionService = {

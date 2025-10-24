@@ -30,6 +30,12 @@ app.use(cors({
     credentials: true,
 }));
 
+// app.use(cors({
+//     origin: envVars.FRONTEND_URL.split(","),
+//     credentials: true,
+// }));
+
+
 app.use("/api/v1", router);
 
 app.get("/", (req: Request, res: Response) => {

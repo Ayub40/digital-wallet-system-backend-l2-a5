@@ -34,6 +34,7 @@ exports.createUserZodSchema = zod_1.default.object({
         message: "Phone number must be valid for Bangladesh. Format: +8801XXXXXXXXX or 01XXXXXXXXX",
     })
         .optional(),
+    role: zod_1.default.enum(Object.values(user_interface_1.Role)).default(user_interface_1.Role.USER),
 });
 exports.updateUserZodSchema = zod_1.default.object({
     name: zod_1.default

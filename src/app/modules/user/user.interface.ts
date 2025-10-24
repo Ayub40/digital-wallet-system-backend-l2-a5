@@ -34,7 +34,7 @@ export interface IUser {
     isVerified?: boolean,
     role: Role;
     isApproved: boolean,
-    isAgentStatus: IsAgentStatus,
+    isAgentStatus?: IsAgentStatus,
     auths: IAuthProvider[];
     wallet?: Types.ObjectId,
 }

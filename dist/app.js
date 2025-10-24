@@ -23,6 +23,7 @@ app.use(passport_1.default.initialize());
 app.use(passport_1.default.session());
 app.use((0, cookie_parser_1.default)());
 app.use(express_1.default.json());
+// trust proxy dia external live link golo trust korbe
 app.set("trust proxy", 1);
 // eta Cloudinary(image er form data) er jonno
 // app.use(express.urlencoded({ extended: true }))

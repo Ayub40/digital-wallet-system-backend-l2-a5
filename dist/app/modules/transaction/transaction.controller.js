@@ -32,7 +32,9 @@ const addMoney = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void
 }));
 const withdrawMoney = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const decodeToken = req.user;
-    const wallet = yield transaction_service_1.TransactionService.withdrawMoney(decodeToken.userId, req.body.amount);
+    const { amount, agent } = req.body;
+    // const wallet = await TransactionService.withdrawMoney(decodeToken.userId, req.body.amount);
+    const wallet = yield transaction_service_1.TransactionService.withdrawMoney(decodeToken.userId, amount, agent);
     (0, sendResponse_1.sendResponse)(res, {
         success: true,
         statusCode: http_status_codes_1.default.OK,
@@ -41,9 +43,9 @@ const withdrawMoney = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter
     });
 }));
 const sendMoney = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { receiverId, amount } = req.body;
+    const { receiver, amount } = req.body;
     const decodeToken = req.user;
-    const result = yield transaction_service_1.TransactionService.sendMoney(decodeToken.userId, receiverId, amount);
+    const result = yield transaction_service_1.TransactionService.sendMoney(decodeToken.userId, receiver, amount);
     (0, sendResponse_1.sendResponse)(res, {
         success: true,
         statusCode: http_status_codes_1.default.OK,
@@ -53,22 +55,24 @@ const sendMoney = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, v
 }));
 const getHistory = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const decodeToken = req.user;
-    const history = yield transaction_service_1.TransactionService.getHistory(decodeToken.userId);
+    const history = yield transaction_service_1.TransactionService.getHistory(decodeToken.userId, req.query);
     (0, sendResponse_1.sendResponse)(res, {
         success: true,
         statusCode: http_status_codes_1.default.OK,
         message: "Transaction history fetched successfully",
-        data: history
+        // data: history
+        data: history.data,
+        meta: history.meta,
     });
 }));
 // For AGENT
 const agentCashIn = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const agent = req.user;
-    const { userId, amount } = req.body;
+    const { identifier, amount } = req.body;
     if (agent.role !== user_interface_1.Role.AGENT) {
         throw new AppError_1.default(http_status_codes_1.default.FORBIDDEN, "Only agents can perform cash-in");
     }
-    const wallet = yield transaction_service_1.TransactionService.agentCashIn(agent.userId, userId, amount);
+    const wallet = yield transaction_service_1.TransactionService.agentCashIn(agent.userId, identifier, amount);
     (0, sendResponse_1.sendResponse)(res, {
         success: true,
         statusCode: http_status_codes_1.default.OK,
@@ -78,11 +82,11 @@ const agentCashIn = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0,
 }));
 const agentCashOut = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const agent = req.user;
-    const { userId, amount } = req.body;
+    const { identifier, amount } = req.body;
     if (agent.role !== user_interface_1.Role.AGENT) {
         throw new AppError_1.default(http_status_codes_1.default.FORBIDDEN, "Only agents can perform cash-out");
     }
-    const wallet = yield transaction_service_1.TransactionService.agentCashOut(agent.userId, userId, amount);
+    const wallet = yield transaction_service_1.TransactionService.agentCashOut(agent.userId, identifier, amount);
     (0, sendResponse_1.sendResponse)(res, {
         success: true,
         statusCode: http_status_codes_1.default.OK,
@@ -101,13 +105,15 @@ const agentCommissionHistory = (0, catchAsync_1.catchAsync)((req, res) => __awai
     });
 }));
 // For Admin
-const getAllTransactions = (0, catchAsync_1.catchAsync)((_req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const transactions = yield transaction_service_1.TransactionService.getAllTransactions();
+const getAllTransactions = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const query = req.query;
+    const transactions = yield transaction_service_1.TransactionService.getAllTransactions(query);
     (0, sendResponse_1.sendResponse)(res, {
         success: true,
         statusCode: http_status_codes_1.default.OK,
         message: "All transactions fetched successfully",
-        data: transactions
+        data: transactions.data,
+        meta: transactions.meta,
     });
 }));
 exports.TransactionController = {
